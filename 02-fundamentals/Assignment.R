@@ -2,10 +2,10 @@ getwd()
 setwd("C:/Users/Venkatesh/Documents/Machine Learning/tmp/CSX460/02-fundamentals/data")
 
 #1
-airports <- read.csv("airports.csv")
-flights <- read.csv("flights.csv")
-planes <- read.csv("planes.csv")
-weather <- read.csv("weather.csv")
+airports <- read.csv("airports.csv", stringsAsFactors = FALSE)
+flights <- read.csv("flights.csv", stringsAsFactors = FALSE)
+planes <- read.csv("planes.csv", stringsAsFactors = FALSE)
+weather <- read.csv("weather.csv", stringsAsFactors = FALSE)
 
 #2
 hist(flights$arr_delay,main="Histogram for Air Passengers", 
@@ -44,9 +44,9 @@ airportFlightTable <- airportTable[flightTable,nomatch=0]
 setkey(airportFlightTable,tailnum)
 setkey(planeTable,tailnum)
 airportFlightPlaneTable <- airportFlightTable[planeTable,nomatch=0]
-setkey(airportFlightPlaneTable,faa)
-setkey(weatherTable,origin)
-Result <- airportFlightPlaneTable[weatherTable, allow.cartesian = TRUE]
+setkey(airportFlightPlaneTable,faa,year,month,day,hour)
+setkey(weatherTable,origin,year,month,day,hour)
+Result <- airportFlightPlaneTable[weatherTable]
 Result
   
   
