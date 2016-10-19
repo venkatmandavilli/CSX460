@@ -18,7 +18,7 @@ for building a model. Describe/Explain each of the steps and show all work in co
 ## Step 1: Collect Data 
 
 ```{r "Step 1: Collect Data" }
-
+numericData <- YX[,sapply(YX,is.numeric),with=FALSE]
 ```
 
 ## Step 2: Explore and Prep The Data
@@ -28,13 +28,15 @@ One of the things not done in the MLwR text is a pairwise comparison between the
 
 
 ```{r "Step 2: Explore and Prep The Data" }
-
+write.csv(cor(numericData,use="p"),file="cor_data.csv")
+pairs.panels(data.frame(numericData$dep_delay,numericData$dep_time,numericData$hour,numericData$arr_delay),use="complete")
 ```
 
 ## Step 3:  Train The Model
 
 ```{r "Step 3: Train The Model" }
-
+ins_model <- lm(arr_delay ~ dep_delay + dep_time, data=YX)
+# Based on the Correlation matrix above, the highest correlation features are added into the model.
 ```
 
 ## Step 4: Evaluate Performance
@@ -42,6 +44,10 @@ One of the things not done in the MLwR text is a pairwise comparison between the
 Evaluating performance is a crutial step, that has yet to be treated well by the MLwR. Think about some of the tools that you have for evaluating performance.  Choose one and articulate why you have chosen it.
 
 ```{r "Step 4: Evaluate Performance" }
+summary(ins_model)
+# Summary function gives us Residual section, Residual standard error, Significance factor and R-squared values
+#Residual standard error: 18.03
+#Multiple R-squared:  0.8369,  Adjusted R-squared:  0.8369 
 
 ```
 
@@ -51,6 +57,15 @@ Evaluating performance is a crutial step, that has yet to be treated well by the
 Show some steps for improving model performance.
 
 ```{r "Step 5: Improve Performance" }
+#Stepwise regression(BiDirectional Elimination)
+#Categorical features like 'faa' are also added to check if the R-squared values increased without greatly increasing Residual standard error
+# Use y = a + bx + cx^2 for the graphs with non linear regression using pairs.panels
+# Each feature is included and excluded along with combinations operator like '*' to see if the performance has improved 
+YX$dep_time2 <- YX$dep_time^2
+ins_model <- lm(arr_delay ~ faa +dep_delay + arr_time*dep_time + dep_time2 + hour + year*month*day +lat*lon*distance, data=YX)
+summary(ins_model)
+#Residual standard error: 17.15 on 267671 degrees of freedom
+#Multiple R-squared:  0.8557,  Adjusted R-squared:  0.8556  
 
 ```
 
@@ -58,4 +73,6 @@ Show some steps for improving model performance.
 # Question:
 
 Is this a good model?  (Write your answer here.)
+#It looks like a decent model with 85% of proabability for correct predictions. 
+#I do think it can be improved by avoiding overfitting problems and using advanced  feature transformation techniques.
 
