@@ -24,6 +24,26 @@ knitr::opts_chunk$set(echo = TRUE)
 **Hint:** For plotting curves see `?graphics::curve` or `?ggplot2::stat_function`
 
 ```{r "Logistic and Inverse Logistic" }
+logistic <- function(x) {
+  c(exp(x)/(1+exp(x)))
+  
+}
+
+plot(c(-10,10),logistic(c(-10,10)),main="Scatterplot for Logistic function", 
+     xlab="Vector", ylab="Logistic Function", pch=20)
+
+curve(logistic,from=-100,to=100)
+
+
+inverse <- function(y) {
+  c(log(y/(1-y)))
+}
+
+plot(c(0.3,0.9),inverse(c(0.3,0.9)),main="Scatterplot for Inverse Logistic function", 
+     xlab="Vector", ylab="Inverse Logistic Function", pch=20)
+
+curve(inverse,from=0,to=1)
+
 
 ```
 
@@ -38,6 +58,8 @@ KNIT YOUR DOCUMENT AS *HTML* AND SUBMIT IT AND THE `Rmd` file.
 
 ```{r "Step 1: Collect Data" }
 
+Data <- copy(YX)
+
 ```
 
 ## Step 2: Explore and Prep The Data
@@ -47,12 +69,33 @@ One of the things not done in the MLwR text is a pairwise comparison between the
 
 
 ```{r "Step 2: Explore and Prep The Data" }
+##Response
+Data[,delayed := arr_delay >= 15]
+- Data$delayed
+qplot(Data$delayed,colour="green")
+boxplot(Data$delayed)
+
+
+ Data <- Data[ delayed >= quantile(delayed,0.01,na.rm=TRUE) &  
+           delayed <= quantile(delayed,0.96,na.rm=TRUE) ]
 
 ```
 
 ## Step 3:  Train The Model
 
 ```{r "Step 3: Train The Model" }
+# Naive model
+naive <- mean(Data$delayed)
+
+form <- delayed ~ dep_delay
+fit1 <- glm( form, Data %>% sample_n(1000),family=binomial )
+
+form <- delayed ~ faa + dep_delay + lat +lon +alt + dst + arr_time + carrier + distance + minute + year + day + month + air_time + wind_gust + precip
+
+fit2 <- glm( form , Data %>% sample_n(1e5),family=binomial )
+
+?sample_n
+
 
 ```
 
@@ -62,6 +105,13 @@ Think about some of the tools that you have for evaluating performance.  Choose 
 
 ```{r "Step 4: Evaluate Performance" }
 
+data_test <- Data %>% tail(1e5)
+predicted_prob <- predict(fit2,data_test,type="response")
+head(predicted_prob)
+install.packages("gmodels")
+library("gmodels")
+CrossTable(Data$dep_delay,Data$delayed) 
+
 ```
 
  
@@ -70,6 +120,9 @@ Think about some of the tools that you have for evaluating performance.  Choose 
 Show some steps for improving model performance.
 
 ```{r "Step 5: Improve Performance" }
+install.packages("caret")
+library("caret")
+modelLookup("fit2")
 
 ```
 
@@ -82,4 +135,65 @@ Is this a good model?  (Write your answer here.)
 # PART B:
 
 Your model should be good at explaining tardiness. Now, assume that your job is to predict arrival delays a month in advance. You can no longer use all the features in your model. Retrain your model using only features that will be *known* only a month in advance of the departure time.  Show all steps as above.
+
+str(Data)
+#Step 1: Collect Data
+str(Data)
+
+## Step 2: Explore and Prep The Data
+## Predictors
+
+This is reasonable list of variables that can be used 
+
+- fligths
+  - month             **
+  - dep_delay (?)     
+  - carrier / flight  *
+  - origin            *
+  - dest              *
+  - air_time          **
+  - distance          **  (can make up time in the air)
+  - air time / hour / minute not known at end of flight
+  
+- planes
+  - year              ** 
+  - type              **
+  - manufacture
+  - engines          (not much variation)
+  - seats
+  - engine           **
+  - speed            (Too many NAs decrease the performance of the model)
+
+- weather 
+  - temp             
+  - dewp
+  - wind_dir         
+  - wind_gust         
+  - precip           
+  - pressure         
+  - visib            
+  
+- airports (origin and dest)
+  - faa or name
+  - lat             ** dest(only)
+  - lon             ** dest(only)
+  - alt              
+  
+
+
+
+#The independent factors to predict arr_delay forone month in the future would be
+form <- faa + sched_dep_time + sched_arr_time + distancelat +lon +year*month*day
+
+## Step 3:  Train The Model
+fit <- glm( form , Data %>% sample_n(1e5) )
+library(MASS)
+fit.step <- stepAIC(fit, scope=list(upper=. ~ ., lower = . ~ 1 ) )
+
+## Step 4: Evaluate Performance" 
+
+fit %>% resid %>% .^2 %>% mean %>% sqrt 
+
+
+
 
