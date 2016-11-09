@@ -55,6 +55,7 @@ calculate:
 ?predict
 predicted_prob <- predict(improvedfit, credit_test_sample,type="response")
 head(predicted_prob)
+#Unable to create predicted_prob
 
 * Misclassification Rate
 * Prevalence 
