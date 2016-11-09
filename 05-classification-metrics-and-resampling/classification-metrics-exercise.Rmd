@@ -8,9 +8,39 @@ output: html_document
 The German Credit Data (data/german_credit); 
 
 1. Read in the German Credit Data
+
+getwd()
+setwd("C:/Users/Venkatesh/Documents/Machine Learning/tmp/CSX460/data")
+credit_info <- read.csv("german_credit.csv", stringsAsFactors = FALSE)
+
 2. Partition the model into Test and Training Sets using only `base::sample` 
+
+credit_train_sample <- credit_info[1:900,]
+credit_train_sample
+credit_test_sample <- credit_info[901:1000,]
+credit_test_sample
+
+rownames(credit_test_sample) <- c()
+
 3. Train a model for `Creditability` 
+
+naivefit <- median(credit_info$Creditability)
+naivefit
+
+
+form <- Creditability ~ .
+fit <- glm(form,credit_train_sample,family=binomial)
+
+summary(fit)
+
+improvedform <- Creditability ~ Account.Balance + Duration.of.Credit..month. + Payment.Status.of.Previous.Credit + Value.Savings.Stocks + Length.of.current.employment + Instalment.per.cent + Sex...Marital.Status
+improvedfit <- glm(improvedform,credit_train_sample,family=binomial)
+summary(improvedfit)
+
+
 4. Knit the document and submit both the this file Rmd and html files.
+
+knitr::opts_chunk$set(echo = TRUE)
 
 Show All Work! 
 
@@ -22,6 +52,9 @@ Show All Work!
 
 Using the `predict` function and `test` data, write functions to calculate and 
 calculate: 
+?predict
+predicted_prob <- predict(improvedfit, credit_test_sample,type="response")
+head(predicted_prob)
 
 * Misclassification Rate
 * Prevalence 
