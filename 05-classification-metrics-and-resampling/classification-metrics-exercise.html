@@ -155,9 +155,9 @@ credit_info &lt;- read.csv(&ldquo;german_credit.csv&rdquo;, stringsAsFactors = F
 <li>Partition the model into Test and Training Sets using only <code>base::sample</code> </li>
 </ol>
 
-<p>credit_train_sample &lt;- credit_info[1:900,]
+<p>credit_train_sample &lt;- credit_info[101:1000,]
 credit_train_sample
-credit_test_sample &lt;- credit_info[901:1000,]
+credit_test_sample &lt;- credit_info[1:100,]
 credit_test_sample</p>
 
 <p>rownames(credit_test_sample) &lt;- c()</p>
@@ -174,8 +174,9 @@ fit &lt;- glm(form,credit_train_sample,family=binomial)</p>
 
 <p>summary(fit)</p>
 
-<p>improvedform &lt;- Creditability ~ Account.Balance + Duration.of.Credit..month. + Payment.Status.of.Previous.Credit + Value.Savings.Stocks + Length.of.current.employment + Instalment.per.cent + Sex&hellip;Marital.Status
-improvedfit &lt;- glm(improvedform,credit_train_sample,family=binomial)
+<p>improvedform &lt;- Creditability ~ Account.Balance + Duration.of.Credit..month. + Payment.Status.of.Previous.Credit + Value.Savings.Stocks + Length.of.current.employment + Instalment.per.cent + Sex&hellip;Marital.Status</p>
+
+<p>improvedfit &lt;- glm(improvedform,credit_train_sample,family=binomial)
 summary(improvedfit)</p>
 
 <ol>
@@ -189,25 +190,62 @@ summary(improvedfit)</p>
 <p>Using the <code>predict</code> function and <code>test</code> data, write functions to calculate and 
 calculate: 
 ?predict
-predicted_prob &lt;- predict(improvedfit, credit_test_sample,type=&ldquo;response&rdquo;)
-head(predicted_prob)
-#Unable to create predicted_prob</p>
+predicted_prob &lt;- predict(improvedfit, credit_test_sample,type=&ldquo;response&rdquo;)</p>
+
+<p>head(predicted_prob)</p>
+
+<p>credit_wrothy &lt;- predicted_prob
+credit_risk &lt;- 1-predicted_prob</p>
+
+<p>credit_results &lt;- data.frame(credit_wrothy,credit_risk)
+credit_results$predicted_result &lt;- ifelse(credit_results$credit_wrothy &gt;= 0.5, 1, 0)
+credit_results$actual_result &lt;- credit_test_sample$Creditability</p>
+
+<p>credit_results</p>
+
+<p>table(credit_results$actual_result,credit_results$predicted_result)</p>
+
+<p>install.packages(&ldquo;gmodels&rdquo;)
+library(gmodels)
+CrossTable(credit_results$actual_result,credit_results$predicted_result)</p>
+
+<p>TN &lt;- 3
+TP &lt;- 89
+FN &lt;- 7
+FP &lt;- 1</p>
+
+<p>total &lt;- TN + TP + FN + FP</p>
+
+<p>Cross</p>
 
 <ul>
-<li>Misclassification Rate</li>
-<li>Prevalence </li>
-<li>Accuracy</li>
-<li>Accuracy</li>
-<li>Error Rate / Misclassification Rate</li>
-<li>True Positive Rate<br/></li>
-<li>False Positive Rate</li>
-<li>True Negative Rate<br/></li>
-<li>False Negative Rate </li>
-<li>Sensitivity </li>
-<li>Specificity </li>
-<li>Recall </li>
-<li>Precision</li>
+<li><p>Misclassification Rate
+(FP + FN)/total</p></li>
+<li><p>Prevalence 
+(FN + TP)/total</p></li>
+<li><p>Accuracy
+(TP + TN)/total</p></li>
+<li><p>True Positive Rate 
+(TP)/(FN + TP)</p></li>
+<li><p>False Positive Rate
+FP/(FP + TN) </p></li>
+<li><p>True Negative Rate<br/>
+TN/(TN + FP)</p></li>
+<li><p>False Negative Rate 
+FN/(TN + FP)</p></li>
+<li><p>Sensitivity
+(TP)/(FN + TP)</p></li>
+<li><p>Specificity 
+TN/(TN + FP)</p></li>
+<li><p>Recall 
+TP/(TP + FN)</p></li>
+<li><p>Precision
+TP/(TP + FP)</p></li>
 </ul>
+
+<p>install.packages(&#39;e1071&#39;, dependencies=TRUE)
+library(caret)
+confusionMatrix(credit_results$predicted_result,credit_results$actual_result,positive=&ldquo;1&rdquo;)</p>
 
 </body>
 
