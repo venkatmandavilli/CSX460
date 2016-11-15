@@ -15,9 +15,9 @@ credit_info <- read.csv("german_credit.csv", stringsAsFactors = FALSE)
 
 2. Partition the model into Test and Training Sets using only `base::sample` 
 
-credit_train_sample <- credit_info[1:900,]
+credit_train_sample <- credit_info[101:1000,]
 credit_train_sample
-credit_test_sample <- credit_info[901:1000,]
+credit_test_sample <- credit_info[1:100,]
 credit_test_sample
 
 rownames(credit_test_sample) <- c()
@@ -34,6 +34,7 @@ fit <- glm(form,credit_train_sample,family=binomial)
 summary(fit)
 
 improvedform <- Creditability ~ Account.Balance + Duration.of.Credit..month. + Payment.Status.of.Previous.Credit + Value.Savings.Stocks + Length.of.current.employment + Instalment.per.cent + Sex...Marital.Status
+
 improvedfit <- glm(improvedform,credit_train_sample,family=binomial)
 summary(improvedfit)
 
@@ -54,22 +55,72 @@ Using the `predict` function and `test` data, write functions to calculate and
 calculate: 
 ?predict
 predicted_prob <- predict(improvedfit, credit_test_sample,type="response")
+
+
 head(predicted_prob)
-#Unable to create predicted_prob
+
+credit_wrothy <- predicted_prob
+credit_risk <- 1-predicted_prob
+
+credit_results <- data.frame(credit_wrothy,credit_risk)
+credit_results$predicted_result <- ifelse(credit_results$credit_wrothy >= 0.5, 1, 0)
+credit_results$actual_result <- credit_test_sample$Creditability
+
+credit_results
+
+table(credit_results$actual_result,credit_results$predicted_result)
+
+install.packages("gmodels")
+library(gmodels)
+CrossTable(credit_results$actual_result,credit_results$predicted_result)
+
+TN <- 3
+TP <- 89
+FN <- 7
+FP <- 1
+
+total <- TN + TP + FN + FP
+
+Cross
 
 * Misclassification Rate
+(FP + FN)/total
+
 * Prevalence 
+(FN + TP)/total
+
 * Accuracy
-* Accuracy
-* Error Rate / Misclassification Rate
-* True Positive Rate  
+(TP + TN)/total
+
+* True Positive Rate 
+(TP)/(FN + TP)
+
 * False Positive Rate
+FP/(FP + TN) 
+
 * True Negative Rate  
+TN/(TN + FP)
+
 * False Negative Rate 
-* Sensitivity 
+FN/(TN + FP)
+
+* Sensitivity
+(TP)/(FN + TP)
+
 * Specificity 
+TN/(TN + FP)
+
 * Recall 
+TP/(TP + FN)
+
+
 * Precision
+TP/(TP + FP)
+
+install.packages('e1071', dependencies=TRUE)
+library(caret)
+confusionMatrix(credit_results$predicted_result,credit_results$actual_result,positive="1")
+
 
 ```{r, echo=FALSE}
 
