@@ -5,8 +5,9 @@ date:
 output: html_document
 ---
 
-The German Credit Data (data/german_credit); 
+Using the first **logistic regression** model that you created in previous exercise; 
 
+<<<<<<< HEAD
 1. Read in the German Credit Data
 
 getwd()
@@ -44,14 +45,21 @@ summary(improvedfit)
 knitr::opts_chunk$set(echo = TRUE)
 
 Show All Work! 
+=======
+1. Partition the model into Test and Training Sets using only `base::sample` 
+>>>>>>> 8fe85381848cdf07ea935b64278d672be3467f79
 
 ```{r}
 
+```
+
+2. Re-train the model on the training data 
+
+```{r}
 
 ```
 
-
-Using the `predict` function and `test` data, write functions to calculate and 
+3. Using the `predict` function and `test` data, write functions to calculate and 
 calculate: 
 ?predict
 predicted_prob <- predict(improvedfit, credit_test_sample,type="response")
