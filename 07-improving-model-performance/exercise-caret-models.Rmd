@@ -1,6 +1,6 @@
 ---
 title: "Improving Model Perfromance / Tuning Parameters"
-author: "Your Name"
+author: "Venkatesh Mandavilli"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -10,6 +10,8 @@ output: html_document
 
 Generically and regardless of model type, what are the purposes of a model
 tuning parameters?
+
+In machine learning, any model's performance is hgihly dependednt on the parameters used for generating it. It is important we set the parameters in such a way so as to get the best results from the model. Libraries like Caret have many tools to assist with automatic parameter tuning to deliver the best fit.
 
 ```
 ```
@@ -36,13 +38,32 @@ Save the caret objects with the names provided.
 ```{r}
 
 # Your work here.
+Data <- copy(YX)
+Data
+str(Data)
+library(caret)
+modelLookup("glm")
+lmform <- arr_delay ~ faa + dep_delay + lat +lon +alt + dst + arr_time + carrier + distance + minute + year + day + month + air_time + wind_gust + precip
+form <- delayed ~ faa + dep_delay + lat +lon +alt + dst + arr_time + carrier + distance + minute + year + day + month + air_time + wind_gust + precip
 
-fit.glm <- ..
-fit.knn <- ..
-fit.rpart <- ..
-fit.rf <- ..
-fit.myown1 <- ..
-fit.myown1 <- ..
+test <- delayed ~ dep_delay
+test2 <- arr_delay ~ dep_delay
+Data$delayed <- as.factor(Data$delayed)
+set.seed(300)
+saveRDS(Data, "data.rds")
+fit.glm <- train(form, data = Data, method = "glm",na.action = na.pass)
+fit.glm
+str(fit.glm)
+fit.knn <- train(form, data = Data, method = "knn",na.action = na.pass)
+fit.knn
+fit.rpart <- train(form, data = Data, method = "rpart",na.action = na.pass)
+fit.rpart
+fit.rf <- train(form, data = Data, method = "rf",na.action = na.pass)
+fit.rf
+fit.myown1 <- train(form, data = Data, method = "C5.0",na.action = na.pass)
+fit.myown1
+fit.myown2 <- train(form, data = Data, method = "M5",na.action = na.pass)
+fit.myown2
 ```
 
 Compare the  models?
