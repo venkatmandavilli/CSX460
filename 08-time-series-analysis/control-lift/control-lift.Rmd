@@ -1,7 +1,7 @@
 ---
 title: "control-lift-stability"
-author: "Christopher Brown"
-date: "November 30, 2016"
+author: "Venkatesh Mandavilli"
+date: "December 7, 2016"
 output: html_document
 ---
 
