@@ -15,8 +15,47 @@ beta (roll angle) for the hypothetical aircraft.
 Show all work:
 
 ```r
+?readRDS
+YX <- readRDS("C:/Users/Venkatesh/Documents/Machine Learning/tmp/CSX460/08-time-series-analysis/control-lift/control-lift.rds")
+form <- cl.stab ~ alpha.deg + beta.deg
+
+ins_model <- lm(form, data=YX)
+
+
+summary(ins_model)
+
+install.packages("ggplot2", dependencies = TRUE)
+
+install.packages("caret", dependencies = TRUE)
+
+library("ggplot2")
+library("caret")
+
+
+qplot(YX$cl.stab)
+str(YX)
+
+fit <- train(YX$cl.stab ~ .,YX,method="lm" )
+
+fit.naive <- train(cl.stab - 1, cl, method="lm" )
+#better fit
+form <- cl.stab ~ alpha.deg + I(alpha.deg^2)
+fit <- train(form, YX, method="lm")
+summary(fit)
+#dummy variable
+
+
+#poly 
+
+form <- cl.stab ~ poly(alpha.deg,9)
+
+form.ho <- cl.stab ~ poly(alpha.deg,8)*poly(beta.deg,4)
+
+fit <- train(form.ho,YX, method="lmStepAIC",scope=list(lower=.~1,upper=.~.))
 
 ```
+
+
 
 How good is your model?
 
